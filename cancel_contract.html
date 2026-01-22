@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Huỷ Hợp Đồng - Batch 41</title>
 
-    <!-- FONT -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
@@ -16,12 +15,15 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-        font-family: "Roboto", sans-serif;
+        font-family: Roboto, sans-serif;
       }
-
       body {
         background: #f0f4f8;
         padding-top: 85px;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       /* ===== LOGIN ===== */
@@ -34,7 +36,6 @@
         justify-content: center;
         z-index: 9999;
       }
-
       .login-box {
         background: #fff;
         padding: 30px 35px;
@@ -44,39 +45,7 @@
         box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
       }
 
-      .login-box h2 {
-        margin-bottom: 20px;
-        color: #007bff;
-      }
-
-      .login-box input {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        margin-bottom: 15px;
-        text-align: center;
-        font-size: 16px;
-      }
-
-      .login-box button {
-        width: 100%;
-        padding: 12px;
-        background: #007bff;
-        border: none;
-        border-radius: 8px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-      }
-
-      #loginError {
-        color: red;
-        margin-top: 10px;
-        font-size: 14px;
-      }
-
-      /* ===== HEADER (GIỐNG INDEX) ===== */
+      /* ===== HEADER ===== */
       header {
         position: fixed;
         top: 0;
@@ -91,7 +60,6 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         z-index: 1000;
       }
-
       .logo {
         font-size: 20px;
         font-weight: 700;
@@ -100,58 +68,51 @@
         align-items: center;
         gap: 8px;
       }
-
       nav a {
         margin-left: 22px;
         text-decoration: none;
         font-weight: 500;
         color: #333;
-        padding-bottom: 4px;
       }
-
       nav a:hover {
         color: #007bff;
       }
 
-      /* ===== CONTAINER ===== */
+      /* ===== TOOL (NGUYÊN BẢN) ===== */
       .container {
-        max-width: 520px;
-        margin: auto;
-        background: #ffffff;
-        padding: 30px 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 480px;
+        background: #fff;
+        padding: 30px 35px;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
       }
-
       h1 {
         text-align: center;
-        margin-bottom: 25px;
+        margin-bottom: 20px;
       }
-
       label {
+        margin-top: 12px;
         display: block;
-        margin-top: 14px;
         font-weight: 500;
+        font-size: 14px;
       }
-
       input,
-      textarea,
-      select {
+      select,
+      textarea {
         width: 100%;
-        padding: 11px 13px;
+        padding: 10px 12px;
         margin-top: 6px;
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 14px;
       }
-
       textarea {
         resize: none;
-        height: 80px;
+        height: 70px;
       }
-
       button {
-        margin-top: 20px;
+        margin-top: 14px;
         width: 100%;
         padding: 13px;
         border-radius: 10px;
@@ -162,20 +123,43 @@
         background: #e74c3c;
         color: #fff;
       }
-
       .copy-btn {
         display: none;
-        margin-top: 10px;
         background: #3498db;
       }
-
       .result {
         display: none;
-        margin-top: 25px;
-        padding: 15px;
+        margin-top: 20px;
+        padding: 14px;
         background: #eef4ff;
         border-radius: 8px;
         white-space: pre-line;
+        font-size: 14px;
+      }
+      .missing {
+        border: 2px solid #e74c3c !important;
+        background: #fff0f0;
+      }
+      .hint {
+        color: #e74c3c;
+        font-weight: 600;
+      }
+      .suggest-box {
+        margin-top: 6px;
+        padding: 8px;
+        background: #f8faff;
+        border: 1px dashed #3498db;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .suggest-box span {
+        display: inline-block;
+        background: #3498db;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin: 4px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -187,7 +171,7 @@
         <h2>🔐 Đăng nhập</h2>
         <input type="password" id="loginKey" placeholder="Nhập khoá truy cập" />
         <button onclick="login()">Xác nhận</button>
-        <p id="loginError"></p>
+        <p id="loginError" style="color: red; margin-top: 8px"></p>
       </div>
     </div>
 
@@ -202,22 +186,58 @@
       </nav>
     </header>
 
-    <!-- CONTENT -->
+    <!-- CONTENT (NGUYÊN BẢN) -->
     <div class="container">
-      <h1>Form Huỷ Hợp Đồng</h1>
+      <h1>Huỷ Hợp Đồng</h1>
 
       <form id="cancelForm">
         <label>Số hợp đồng</label>
-        <input type="text" id="contract" required />
+        <input type="text" id="contract" />
 
         <label>Tên khách hàng</label>
-        <input type="text" id="customer" required />
+        <input type="text" id="customer" />
 
         <label>Code SI</label>
         <input type="text" id="si" value="HPO00001" />
 
         <label>POScode</label>
-        <input type="text" id="pos" placeholder="VD: 00974 hoặc POS00974" />
+        <input
+          type="text"
+          id="posSearch"
+          placeholder="Nhập mã hoặc tên cửa hàng..."
+        />
+        <select id="pos" size="8">
+          <option value="">-- Chọn cửa hàng --</option>
+
+          <!-- HONDA HỒNG ĐỨC -->
+          <option value="POS00354">POS00354 - HONDA HỒNG ĐỨC 1</option>
+          <option value="POS00355">POS00355 - HONDA HỒNG ĐỨC 2</option>
+          <option value="POS00356">POS00356 - HONDA HỒNG ĐỨC 3</option>
+          <option value="POS00357">POS00357 - HONDA HỒNG ĐỨC 4</option>
+          <option value="POS01032">POS01032 - HONDA HỒNG ĐỨC 6</option>
+          <option value="POS00974">POS00974 - HONDA HỒNG ĐỨC 7</option>
+          <option value="POS07429">POS07429 - HONDA HỒNG ĐỨC 9</option>
+          <option value="POS24161">POS24161 - HONDA HỒNG ĐỨC 13</option>
+
+          <!-- MULTI HỒNG ĐỨC -->
+          <option value="POS29956">POS29956 - MULTI HỒNG ĐỨC 14</option>
+          <option value="POS49223">POS49223 - MULTI HỒNG ĐỨC LỌ TẺ</option>
+          <option value="POS32299">POS32299 - MULTI HỒNG ĐỨC VĨNH THẠNH</option>
+
+          <!-- OFF MULTI -->
+          <option value="POS49022">POS49022 - OFF MULTI HÙNG ĐẠT 79</option>
+          <option value="POS10807">POS10807 - OFF MULTI THANH THẢO 2</option>
+          <option value="POS10806">POS10806 - OFF MULTI THANH THẢO 1</option>
+          <option value="POS53624">POS53624 - OFF MULTI HÙNG LOAN</option>
+          <option value="POS06304">POS06304 - OFF MULTI PHÁT NGA</option>
+          <option value="POS06314">POS06314 - OFF MULTI LÊ TUẤN</option>
+
+          <!-- OFF EB EC TÙNG LÂM -->
+          <option value="POS25661">POS25661 - OFF EB EC TÙNG LÂM CT</option>
+          <option value="POS50167">POS50167 - OFF EB EC TÙNG LÂM 3</option>
+        </select>
+
+        <div class="suggest-box" id="posSuggest"></div>
 
         <label>Trạng thái Indus</label>
         <select id="status">
@@ -241,8 +261,6 @@
         </select>
 
         <textarea id="reason" placeholder="Hoặc nhập lý do khác..."></textarea>
-
-        <button type="submit">Tạo nội dung</button>
       </form>
 
       <div class="result" id="resultBox"></div>
@@ -251,7 +269,6 @@
 
     <script>
       const ACCESS_KEY = "B41";
-
       function login() {
         const key = document.getElementById("loginKey").value;
         if (key === ACCESS_KEY) {
@@ -262,66 +279,133 @@
             "❌ Khoá truy cập không đúng";
         }
       }
-
       function logout() {
         sessionStorage.removeItem("logged");
-        location.href = "index.html";
+        location.reload();
       }
-
       window.onload = () => {
-        if (sessionStorage.getItem("logged") === "1") {
+        if (sessionStorage.getItem("logged") === "1")
           document.getElementById("loginScreen").style.display = "none";
-        }
       };
 
-      document.getElementById("pos").addEventListener("blur", function () {
-        let value = this.value.trim().toUpperCase();
-        if (value && !value.startsWith("POS")) value = "POS" + value;
-        this.value = value;
+      const posSearch = document.getElementById("posSearch");
+      const posSelect = document.getElementById("pos");
+      const posSuggest = document.getElementById("posSuggest");
+      const allOptions = [...posSelect.options];
+
+      posSearch.addEventListener("input", () => {
+        const k = posSearch.value.toLowerCase();
+        posSelect.innerHTML = "";
+        allOptions.forEach((o) => {
+          if (o.text.toLowerCase().includes(k) || o.value === "")
+            posSelect.appendChild(o);
+        });
       });
 
-      document
-        .getElementById("cancelForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
+      const resultBox = document.getElementById("resultBox");
+      const copyBtn = document.getElementById("copyBtn");
 
-          const contract = document.getElementById("contract").value;
-          const customer = document.getElementById("customer").value;
-          const si = document.getElementById("si").value;
+      [
+        "contract",
+        "customer",
+        "si",
+        "status",
+        "pos",
+        "reasonSelect",
+        "reason",
+      ].forEach((id) => {
+        document.getElementById(id).addEventListener("input", renderText);
+        document.getElementById(id).addEventListener("change", renderText);
+      });
 
-          let pos = document.getElementById("pos").value.trim().toUpperCase();
-          if (pos && !pos.startsWith("POS")) pos = "POS" + pos;
+      const POS_KEY = "pos_weight";
 
-          const status = document.getElementById("status").value;
-          const selectReason = document.getElementById("reasonSelect").value;
-          const textReason = document.getElementById("reason").value;
-          const reason = selectReason || textReason;
+      function getPOSWeight() {
+        return JSON.parse(localStorage.getItem(POS_KEY) || "{}");
+      }
+      function savePOSWeight(obj) {
+        localStorage.setItem(POS_KEY, JSON.stringify(obj));
+        document.cookie =
+          POS_KEY +
+          "=" +
+          encodeURIComponent(JSON.stringify(obj)) +
+          ";path=/;max-age=31536000";
+      }
+      function decayWeight() {
+        const data = getPOSWeight();
+        for (let k in data) data[k] = Math.max(0, data[k] - 0.1);
+        savePOSWeight(data);
+      }
+      decayWeight();
 
-          if (!reason) {
-            alert("Vui lòng chọn hoặc nhập lý do huỷ!");
-            return;
-          }
+      posSelect.addEventListener("change", () => {
+        const code = posSelect.value;
+        if (!code) return;
+        const data = getPOSWeight();
+        data[code] = (data[code] || 0) + 1;
+        savePOSWeight(data);
+        renderPosSuggest();
+        renderText();
+      });
 
-          const text = `Dear Anh,
-Huỷ hồ sơ giúp em.
-Số hợp đồng: ${contract}
-Tên khách hàng: ${customer}
-Code SI: ${si}
-POScode: ${pos}
-Trạng thái Indus: ${status}
-Lý do huỷ: ${reason}`;
+      function renderPosSuggest() {
+        const data = getPOSWeight();
+        const list = Object.entries(data)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+        if (!list.length) {
+          posSuggest.innerHTML = "<i>Chưa có dữ liệu</i>";
+          return;
+        }
+        posSuggest.innerHTML =
+          "<b>POS hay chọn:</b><br>" +
+          list
+            .map((i) => `<span onclick="pickPOS('${i[0]}')">${i[0]}</span>`)
+            .join("");
+      }
+      renderPosSuggest();
 
-          document.getElementById("resultBox").style.display = "block";
-          document.getElementById("copyBtn").style.display = "block";
-          document.getElementById("resultBox").textContent = text;
+      function pickPOS(code) {
+        posSelect.value = code;
+        posSelect.dispatchEvent(new Event("change"));
+      }
+
+      function renderText() {
+        const contract = document.getElementById("contract");
+        const customer = document.getElementById("customer");
+        const si = document.getElementById("si");
+        const pos = posSelect;
+        const status = document.getElementById("status");
+        const reasonVal =
+          document.getElementById("reasonSelect").value ||
+          document.getElementById("reason").value;
+
+        [contract, customer, si, pos].forEach((f) => {
+          if (!f.value.trim()) f.classList.add("missing");
+          else f.classList.remove("missing");
         });
 
-      document.getElementById("copyBtn").addEventListener("click", function () {
-        navigator.clipboard.writeText(
-          document.getElementById("resultBox").textContent,
+        const text = `Dear Anh,
+Huỷ hồ sơ giúp em.
+Số hợp đồng: ${contract.value || "❗[CHƯA NHẬP]"}
+Tên khách hàng: ${customer.value || "❗[CHƯA NHẬP]"}
+Code SI: ${si.value || "❗[CHƯA NHẬP]"}
+POScode: ${pos.value || "❗[CHƯA CHỌN]"}
+Trạng thái Indus: ${status.value}
+Lý do huỷ: ${reasonVal || "❗[CHƯA NHẬP]"}`;
+
+        resultBox.style.display = "block";
+        copyBtn.style.display = "block";
+        resultBox.innerHTML = text.replace(
+          /❗\[.*?\]/g,
+          '<span class="hint">$&</span>'
         );
+      }
+
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(resultBox.textContent);
         alert("Đã copy nội dung!");
-      });
+      };
     </script>
   </body>
 </html>
