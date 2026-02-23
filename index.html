@@ -251,6 +251,7 @@
         class="form-control mb-3"
         oninput="onTraTienChange()"
       />
+      <div id="suggestTraTien" class="list-group mb-2"></div>
 
       <label>Trả trước (%)</label>
       <input
@@ -422,8 +423,75 @@
         });
       }
 
+      function genTraTienSuggest() {
+        let v = parse(traTien.value);
+        let gia = parse(giaXe.value);
+        let percentStart = parseFloat(traPercent.value) || 10;
+
+        let box = suggestTraTien;
+        box.innerHTML = "";
+
+        if (!gia) return;
+
+        let list = [];
+
+        // ===== 1️⃣ Gợi ý theo % bắt đầu từ percent đã chọn =====
+        if (percentStart > 0) {
+          for (let p = percentStart; p <= 80; p += 10) {
+            list.push(gia * (p / 100));
+          }
+        } else {
+          // mặc định
+          for (let p = 20; p <= 80; p += 10) {
+            list.push(gia * (p / 100));
+          }
+        }
+
+        // ===== 2️⃣ Nếu nhập tay =====
+        if (v > 0) {
+          list.push(Math.round(v / 50000) * 50000);
+          list.push(Math.round(v / 100000) * 100000);
+        }
+
+        // ===== 3️⃣ Làm tròn đẹp =====
+        list = list.map((n) => Math.ceil(n / 10000) * 10000);
+
+        // ===== 4️⃣ Lọc =====
+        list = list.filter((n) => n > 0 && n < gia);
+
+        // ===== 5️⃣ Xoá trùng + sort =====
+        list = [...new Set(list)];
+        list.sort((a, b) => a - b);
+
+        // ===== 6️⃣ Render =====
+        list.forEach((n) => {
+          let percent = ((n / gia) * 100).toFixed(1);
+
+          let btn = document.createElement("button");
+
+          btn.className =
+            "list-group-item list-group-item-action d-flex justify-content-between";
+
+          btn.innerHTML = `
+      <span>${format(n)} đ</span>
+      <span style="color:#007bff;font-weight:600">
+        ${percent}%
+      </span>
+    `;
+
+          btn.onclick = () => {
+            traTien.value = format(n);
+            box.innerHTML = "";
+            onTraTienChange();
+          };
+
+          box.appendChild(btn);
+        });
+      }
+
       function onGiaXeChange() {
         formatInput(giaXe);
+        genTraTienSuggest(); // thêm dòng này
         autoTinh();
         onGiaXeSuggest();
       }
@@ -439,6 +507,7 @@
         lock = false;
         let box = suggestGiaXe;
         box.innerHTML = "";
+        genTraTienSuggest(); // thêm dòng này
         autoTinh();
       }
       function onTraPercentChange() {
@@ -450,6 +519,7 @@
         lock = false;
         let box = suggestGiaXe;
         box.innerHTML = "";
+        genTraTienSuggest(); // thêm dòng này
         autoTinh();
       }
 
@@ -472,7 +542,7 @@
           case 0.89:
             heSo = heSo089;
             break;
-          
+
           // case 1.51:
           //   heSo = heSo151;
           //   break;
