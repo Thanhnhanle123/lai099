@@ -129,8 +129,6 @@
         margin: 8px 0;
       }
 
-     
-
       .plan-box.active {
         border: 3px solid #ff9800 !important;
         background: #fff3e0;
@@ -229,9 +227,69 @@
       <div id="packageButtons" class="d-flex gap-2 mb-3"></div>
 
       <div id="result" class="result" style="display: none"></div>
-      <button class="btn btn-warning w-100 mt-2" onclick="exportImage()">
+      <button class="btn btn-warning w-100 mt-2" onclick="openExportModal()">
         📸 Xuất ảnh gửi Zalo
       </button>
+    </div>
+
+    <!-- EXPORT MODAL -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 16px">
+          <div class="modal-header">
+            <h5 class="modal-title">📄 Thông tin xuất ảnh</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Loại xe</label>
+                <input
+                  type="text"
+                  id="modalLoaiXe"
+                  class="form-control text-uppercase"
+                  oninput="forceUpper(this)"
+                  placeholder="VD: SH 160I ABS"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Màu sơn (giá trị số)</label>
+                <input
+                  type="text"
+                  id="modalMauSon"
+                  class="form-control"
+                  oninput="formatNumberInput(this)"
+                  placeholder="VD: 1500000"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Giấy tờ (giá trị số)</label>
+                <input
+                  type="text"
+                  id="modalGiayTo"
+                  class="form-control"
+                  oninput="formatNumberInput(this)"
+                  placeholder="VD: 800000"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              Huỷ
+            </button>
+            <button class="btn btn-warning" onclick="confirmExport()">
+              Xuất ảnh
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -244,6 +302,16 @@
           sessionStorage.setItem("logged", "1");
         } else $("loginError").innerText = "Sai khoá";
       }
+
+      function forceUpper(el) {
+        el.value = el.value.toUpperCase();
+      }
+
+      function formatNumberInput(el) {
+        let value = el.value.replace(/\D/g, ""); // chỉ cho số
+        el.value = Number(value).toLocaleString("vi-VN");
+      }
+
       function logout() {
         sessionStorage.clear();
         location.reload();
@@ -447,15 +515,152 @@
         el.classList.add("active");
       }
 
-      function exportImage() {
-        if ($("result").style.display === "none")
-          return alert("Chưa có dữ liệu");
-        html2canvas($("result")).then((c) => {
+      //     function exportImage() {
+      //       let gia = parse($("giaXe").value);
+      //       let tra = parse($("traTien").value);
+      //       let vay = gia - tra;
+
+      //       if (!gia || !tra || vay <= 0) {
+      //         alert("Chưa có dữ liệu");
+      //         return;
+      //       }
+
+      //       // 🔥 Hỏi loại xe
+      //       let loaiXe = prompt("Nhập loại xe (có thể bỏ trống):");
+      //       if (loaiXe === null) loaiXe = ""; // nếu bấm cancel
+
+      //       const heSo = HE_SO[currentPackage];
+
+      //       let plans = {};
+      //       Object.entries(heSo).forEach(([t, hs]) => {
+      //         let thang = ceil(vay * hs + 12000);
+      //         let tongLai = thang * t - vay;
+
+      //         plans[t] = {
+      //           thang: format(thang) + " đ",
+      //           lai: format(tongLai) + " đ",
+      //         };
+      //       });
+
+      //       let exportDiv = document.createElement("div");
+      //       exportDiv.style.width = "800px";
+      //       exportDiv.style.padding = "40px";
+      //       exportDiv.style.background = "#fff";
+      //       exportDiv.style.fontFamily = "Times New Roman";
+      //       exportDiv.style.color = "#000";
+      //       exportDiv.style.lineHeight = "1.8";
+      //       exportDiv.style.fontSize = "22px";
+
+      //       exportDiv.innerHTML = `
+      //   <h2 style="margin-bottom:20px;">HD SAISON</h2>
+
+      //   ${loaiXe ? `LOẠI XE: ${loaiXe}<br>` : ""}
+      //   GIÁ XE: ${format(gia)} đ<br>
+      //   TRẢ TRƯỚC: ${format(tra)} đ<br>
+      //   KHOẢN VAY: ${format(vay)} đ<br>
+      //   GIẤY TỜ: ..........................................................<br>
+      //   MÀU SƠN: ..........................................................<br><br>
+
+      //   12 tháng: ${plans[12] ? plans[12].thang + " | Lãi: " + plans[12].lai : ""}<br>
+      //   15 tháng: ${plans[15] ? plans[15].thang + " | Lãi: " + plans[15].lai : ""}<br>
+      //   18 tháng: ${plans[18] ? plans[18].thang + " | Lãi: " + plans[18].lai : ""}<br>
+      //   21 tháng: ${plans[21] ? plans[21].thang + " | Lãi: " + plans[21].lai : ""}<br>
+      //   24 tháng: ${plans[24] ? plans[24].thang + " | Lãi: " + plans[24].lai : ""}<br>
+      //   36 tháng: ${plans[36] ? plans[36].thang + " | Lãi: " + plans[36].lai : ""}<br><br>
+
+      //   <strong>THỦ TỤC: CCCD CHIP + ĐTDD</strong>
+      // `;
+
+      //       document.body.appendChild(exportDiv);
+
+      //       html2canvas(exportDiv).then((canvas) => {
+      //         let a = document.createElement("a");
+      //         a.href = canvas.toDataURL("image/png");
+      //         a.download = "bang-tra-gop-hdsaison.png";
+      //         a.click();
+      //         document.body.removeChild(exportDiv);
+      //       });
+      //     }
+      function openExportModal() {
+        let gia = parse($("giaXe").value);
+        let tra = parse($("traTien").value);
+
+        if (!gia || !tra || tra >= gia) {
+          alert("Chưa có dữ liệu hợp lệ");
+          return;
+        }
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("exportModal"),
+        );
+        modal.show();
+      }
+
+      function confirmExport() {
+        let gia = parse($("giaXe").value);
+        let tra = parse($("traTien").value);
+        let vay = gia - tra;
+
+        const loaiXe = $("modalLoaiXe").value.trim();
+        const mauSon = $("modalMauSon").value;
+        const giayTo = $("modalGiayTo").value;
+
+        const heSo = HE_SO[currentPackage];
+
+        let plans = {};
+        Object.entries(heSo).forEach(([t, hs]) => {
+          let thang = ceil(vay * hs + 12000);
+          let tongLai = thang * t - vay;
+
+          plans[t] = {
+            thang: format(thang) + " đ",
+            lai: format(tongLai) + " đ",
+          };
+        });
+
+        let exportDiv = document.createElement("div");
+        exportDiv.style.width = "800px";
+        exportDiv.style.padding = "40px";
+        exportDiv.style.background = "#fff";
+        exportDiv.style.fontFamily = "Times New Roman";
+        exportDiv.style.color = "#000";
+        exportDiv.style.lineHeight = "1.8";
+        exportDiv.style.fontSize = "22px";
+
+        exportDiv.innerHTML = `
+    <h2 style="margin-bottom:20px;">HD SAISON</h2>
+
+    ${loaiXe ? `LOẠI XE: ${loaiXe}<br>` : ""}
+    GIÁ XE: ${format(gia)} đ<br>
+    TRẢ TRƯỚC: ${format(tra)} đ<br>
+    KHOẢN VAY: ${format(vay)} đ<br>
+    ${mauSon ? `MÀU SƠN: ${mauSon} đ<br>` : ""}
+    ${giayTo ? `GIẤY TỜ: ${giayTo} đ<br>` : ""}
+    <br>
+
+    12 tháng: ${plans[12] ? plans[12].thang + " | Lãi: " + plans[12].lai : ""}<br>
+    15 tháng: ${plans[15] ? plans[15].thang + " | Lãi: " + plans[15].lai : ""}<br>
+    18 tháng: ${plans[18] ? plans[18].thang + " | Lãi: " + plans[18].lai : ""}<br>
+    21 tháng: ${plans[21] ? plans[21].thang + " | Lãi: " + plans[21].lai : ""}<br>
+    24 tháng: ${plans[24] ? plans[24].thang + " | Lãi: " + plans[24].lai : ""}<br>
+    36 tháng: ${plans[36] ? plans[36].thang + " | Lãi: " + plans[36].lai : ""}<br><br>
+
+    <strong>THỦ TỤC: CCCD CHIP + ĐTDD</strong>
+  `;
+
+        document.body.appendChild(exportDiv);
+
+        html2canvas(exportDiv).then((canvas) => {
           let a = document.createElement("a");
-          a.href = c.toDataURL();
+          a.href = canvas.toDataURL("image/png");
           a.download = "bang-tra-gop-hdsaison.png";
           a.click();
+          document.body.removeChild(exportDiv);
         });
+
+        bootstrap.Modal.getInstance(
+          document.getElementById("exportModal"),
+        ).hide();
       }
 
       window.onload = () => {
