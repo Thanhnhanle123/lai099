@@ -291,7 +291,7 @@
         </div>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script>
       const ACCESS_KEY = "B41";
       const $ = (id) => document.getElementById(id);
@@ -596,14 +596,14 @@
         modal.show();
       }
 
-      function confirmExport() {
+      async function confirmExport() {
         let gia = parse($("giaXe").value);
         let tra = parse($("traTien").value);
         let vay = gia - tra;
 
-        const loaiXe = $("modalLoaiXe").value.trim();
-        const mauSon = $("modalMauSon").value;
-        const giayTo = $("modalGiayTo").value;
+        const loaiXe = $("modalLoaiXe").value.trim().toUpperCase();
+        const mauSon = $("modalMauSon").value || "";
+        const giayTo = $("modalGiayTo").value || "";
 
         const heSo = HE_SO[currentPackage];
 
@@ -618,45 +618,60 @@
           };
         });
 
+        // Tạo div tạm để render
         let exportDiv = document.createElement("div");
-        exportDiv.style.width = "800px";
-        exportDiv.style.padding = "40px";
+        exportDiv.style.width = "600px";
+        exportDiv.style.padding = "30px";
         exportDiv.style.background = "#fff";
         exportDiv.style.fontFamily = "Times New Roman";
-        exportDiv.style.color = "#000";
-        exportDiv.style.lineHeight = "1.8";
-        exportDiv.style.fontSize = "22px";
+        exportDiv.style.fontSize = "26px";
+        exportDiv.style.lineHeight = "1.6";
 
         exportDiv.innerHTML = `
-    <h2 style="margin-bottom:20px;">HD SAISON</h2>
+  <div style="text-align:left;margin-bottom:20px;">
+    <img src="./images/logo.png" style="max-width:170px;">
+  </div>
 
-    ${loaiXe ? `LOẠI XE: ${loaiXe}<br>` : ""}
-    GIÁ XE: ${format(gia)} đ<br>
-    TRẢ TRƯỚC: ${format(tra)} đ<br>
-    KHOẢN VAY: ${format(vay)} đ<br>
-    ${mauSon ? `MÀU SƠN: ${mauSon} đ<br>` : ""}
-    ${giayTo ? `GIẤY TỜ: ${giayTo} đ<br>` : ""}
-    <br>
+  ${loaiXe ? `<b>LOẠI XE:</b> ${loaiXe}<br>` : ""}
+  <b>GIÁ XE:</b> ${format(gia)} đ<br>
+  <b>TRẢ TRƯỚC:</b> ${format(tra)} đ<br>
+  <b>KHOẢN VAY:</b> ${format(vay)} đ<br>
+  ${mauSon ? `<b>MÀU SƠN:</b> ${mauSon} đ<br>` : ""}
+  ${giayTo ? `<b>GIẤY TỜ:</b> ${giayTo} đ<br>` : ""}
+  <hr style="margin:10px 0;">
 
-    12 tháng: ${plans[12] ? plans[12].thang + " | Lãi: " + plans[12].lai : ""}<br>
-    15 tháng: ${plans[15] ? plans[15].thang + " | Lãi: " + plans[15].lai : ""}<br>
-    18 tháng: ${plans[18] ? plans[18].thang + " | Lãi: " + plans[18].lai : ""}<br>
-    21 tháng: ${plans[21] ? plans[21].thang + " | Lãi: " + plans[21].lai : ""}<br>
-    24 tháng: ${plans[24] ? plans[24].thang + " | Lãi: " + plans[24].lai : ""}<br>
-    36 tháng: ${plans[36] ? plans[36].thang + " | Lãi: " + plans[36].lai : ""}<br><br>
+  12 THÁNG: ${plans[12] ? plans[12].thang + " | Lãi: " + plans[12].lai : ""}<br>
+  15 THÁNG: ${plans[15] ? plans[15].thang + " | Lãi: " + plans[15].lai : ""}<br>
+  18 THÁNG: ${plans[18] ? plans[18].thang + " | Lãi: " + plans[18].lai : ""}<br>
+  21 THÁNG: ${plans[21] ? plans[21].thang + " | Lãi: " + plans[21].lai : ""}<br>
+  24 THÁNG: ${plans[24] ? plans[24].thang + " | Lãi: " + plans[24].lai : ""}<br>
+  36 THÁNG: ${plans[36] ? plans[36].thang + " | Lãi: " + plans[36].lai : ""}<br>
 
-    <strong>THỦ TỤC: CCCD CHIP + ĐTDD</strong>
-  `;
+  <br>
+  <b>THỦ TỤC:</b> CCCD CHIP + ĐTDĐ
+`;
 
         document.body.appendChild(exportDiv);
 
-        html2canvas(exportDiv).then((canvas) => {
-          let a = document.createElement("a");
-          a.href = canvas.toDataURL("image/png");
-          a.download = "bang-tra-gop-hdsaison.png";
-          a.click();
-          document.body.removeChild(exportDiv);
+        const canvas = await html2canvas(exportDiv, {
+          scale: 2,
+          useCORS: true,
         });
+        const imgData = canvas.toDataURL("image/png");
+
+        const { jsPDF } = window.jspdf;
+
+        // ✅ A6 size (A4 chia 4)
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: [105, 148],
+        });
+
+        pdf.addImage(imgData, "PNG", 0, 0, 105, 148);
+        pdf.save("bang-tra-gop-hdsaison.pdf");
+
+        document.body.removeChild(exportDiv);
 
         bootstrap.Modal.getInstance(
           document.getElementById("exportModal"),
