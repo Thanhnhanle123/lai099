@@ -25,7 +25,6 @@
         padding-top: 56px;
       }
 
-      /* LOGIN */
       #loginScreen {
         position: fixed;
         inset: 0;
@@ -44,7 +43,6 @@
         text-align: center;
       }
 
-      /* HEADER */
       header {
         position: fixed;
         top: 0;
@@ -65,6 +63,7 @@
       }
       .desktop-nav a {
         margin-left: 15px;
+        font-size: 14px;
         text-decoration: none;
         color: #333;
       }
@@ -74,7 +73,6 @@
         }
       }
 
-      /* CONTENT */
       .container-custom {
         max-width: 520px;
         margin: auto;
@@ -83,13 +81,14 @@
         border-radius: 16px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
-      label {
-        font-weight: 500;
-      }
+
       input {
         text-align: right;
         font-size: 16px;
         padding: 12px;
+      }
+      label {
+        font-weight: 500;
       }
 
       .result {
@@ -99,6 +98,7 @@
         border-left: 5px solid #007bff;
         border-radius: 12px;
       }
+
       .plan-box {
         background: #fff;
         border-radius: 14px;
@@ -129,31 +129,15 @@
         margin: 8px 0;
       }
 
-      /* BEST PLAN */
-      .best-plan {
-        border: 2px solid #2e7d32 !important;
-        background: #e8f5e9;
-      }
-      .best-plan::before {
-        content: "💰 RẺ NHẤT";
-        position: absolute;
-        top: -10px;
-        right: 10px;
-        background: #2e7d32;
-        color: #fff;
-        font-size: 12px;
-        padding: 2px 8px;
-        border-radius: 12px;
-      }
+     
 
-      /* CLICK HIGHLIGHT */
       .plan-box.active {
         border: 3px solid #ff9800 !important;
         background: #fff3e0;
         box-shadow: 0 6px 18px rgba(255, 152, 0, 0.4);
       }
       .plan-box.active::after {
-        content: "👉 KHÁCH CHỌN";
+        content: "👉 ĐANG CHỌN";
         position: absolute;
         top: -10px;
         left: 10px;
@@ -163,6 +147,7 @@
         padding: 2px 8px;
         border-radius: 12px;
       }
+
       .list-group button {
         font-size: 14px;
         text-align: left;
@@ -171,7 +156,6 @@
   </head>
 
   <body>
-    <!-- LOGIN -->
     <div id="loginScreen">
       <div class="login-box">
         <h4>🔐 Đăng nhập</h4>
@@ -188,56 +172,16 @@
       </div>
     </div>
 
-    <!-- ===== HEADER ===== -->
     <header>
       <div class="logo">🚗 Batch 41</div>
-
-      <!-- DESKTOP NAV -->
       <nav class="desktop-nav">
-        <a href="index.html">Tính trả góp</a>
-        <a href="check_old.html">Tính tuổi</a>
-        <a href="cancel_contract.html">Huỷ HĐ</a>
+        <a href="./index.html">Tính trả góp</a>
+        <a href="./check_old.html">Tính tuổi</a>
+        <a href="./cancel_contract.html">Huỷ HĐ</a>
         <a href="#" onclick="logout()">Đăng xuất</a>
       </nav>
-
-      <!-- HAMBURGER -->
-      <button
-        class="btn btn-outline-primary d-md-none"
-        data-bs-toggle="offcanvas"
-        data-bs-target="#mobileMenu"
-      >
-        ☰
-      </button>
     </header>
 
-    <!-- ===== MOBILE MENU ===== -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="mobileMenu">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title">🚗 Batch 41</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="offcanvas"
-        ></button>
-      </div>
-      <div class="offcanvas-body">
-        <a class="btn btn-light w-100 mb-2" href="index.html"
-          >📊 Tính trả góp</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="check_old.html"
-          >🎂 Tính tuổi</a
-        >
-        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
-          >❌ Huỷ hợp đồng</a
-        >
-        <hr />
-        <button class="btn btn-danger w-100" onclick="logout()">
-          🔐 Đăng xuất
-        </button>
-      </div>
-    </div>
-
-    <!-- CONTENT -->
     <div class="container-custom mt-3">
       <h5 class="text-center">TÍNH TRẢ GÓP XE</h5>
 
@@ -281,41 +225,10 @@
         </button>
       </div>
 
-      <div class="d-flex gap-2 mb-3">
-        <!-- <button id="btn099" class="btn btn-primary w-100" onclick="setPackage(0.99)">0.99</button> -->
-        <button
-          id="btn089"
-          class="btn btn-primary w-100"
-          onclick="setPackage(0.89)"
-        >
-          0.89
-        </button>
-        <button
-          id="btn121"
-          class="btn btn-secondary w-100"
-          onclick="setPackage(1.21)"
-        >
-          MC1_1.21
-        </button>
-        <button
-          id="btn151"
-          class="btn btn-secondary w-100"
-          onclick="setPackage(1.51)"
-        >
-          MC2_1.51
-        </button>
-        <!-- <button id="btn121" class="btn btn-secondary w-100" onclick="setPackage(1.21)">1.21</button> -->
-        <!-- <button
-          id="btn166"
-          class="btn btn-secondary w-100"
-          onclick="setPackage(1.66)"
-        >
-          1.66
-        </button> -->
-      </div>
+      <!-- Dynamic package buttons -->
+      <div id="packageButtons" class="d-flex gap-2 mb-3"></div>
 
       <div id="result" class="result" style="display: none"></div>
-
       <button class="btn btn-warning w-100 mt-2" onclick="exportImage()">
         📸 Xuất ảnh gửi Zalo
       </button>
@@ -323,258 +236,208 @@
 
     <script>
       const ACCESS_KEY = "B41";
+      const $ = (id) => document.getElementById(id);
+
       function login() {
-        loginKey.value === ACCESS_KEY
-          ? ((loginScreen.style.display = "none"),
-            sessionStorage.setItem("logged", "1"))
-          : (loginError.innerText = "Sai khoá");
+        if ($("loginKey").value === ACCESS_KEY) {
+          $("loginScreen").style.display = "none";
+          sessionStorage.setItem("logged", "1");
+        } else $("loginError").innerText = "Sai khoá";
       }
       function logout() {
         sessionStorage.clear();
         location.reload();
       }
-      window.onload = () => {
-        if (sessionStorage.getItem("logged") === "1")
-          loginScreen.style.display = "none";
+
+      const HE_SO = {
+        0.89: {
+          9: 0.12517,
+          12: 0.09723,
+          15: 0.08049,
+          18: 0.06936,
+          21: 0.06143,
+          24: 0.05548,
+        },
+        1.21: {
+          9: 0.12837,
+          12: 0.1004,
+          15: 0.08367,
+          18: 0.07256,
+          21: 0.06465,
+          24: 0.05874,
+          36: 0.04516,
+        },
+        1.51: {
+          9: 0.131461,
+          12: 0.103484,
+          15: 0.086765,
+          18: 0.075684,
+          21: 0.067811,
+          24: 0.061945,
+          36: 0.048559,
+        },
+        1.78: {
+          9: 0.134079,
+          12: 0.106095,
+          15: 0.089412,
+          18: 0.078378,
+          21: 0.070555,
+          24: 0.064745,
+          36: 0.051548,
+        },
       };
 
-      // const heSo99={9:0.126179,12:0.098233,15:0.081497,18:0.070365,21:0.06244,24:0.05651,36:0.042809};
-      const heSo089 = {
-        9: 0.12517,
-        12: 0.09723,
-        15: 0.08049,
-        18: 0.06936,
-        21: 0.06143,
-        24: 0.05548,
-      };
-      const heSo121 = {
-        9: 0.12837,
-        12: 0.1004,
-        15: 0.08367,
-        18: 0.07256,
-        21: 0.06465,
-        24: 0.05874,
-        36: 0.04516,
-      };
-      const heSo151 = {
-        9: 0.131461,
-        12: 0.103484,
-        15: 0.086765,
-        18: 0.075684,
-        21: 0.067811,
-        24: 0.061945,
-        36: 0.048559,
-      };
-      // 0,131461	0,103484	0,086765	0,075684	0,067811	0,061945	0,053845	0,048559
-      // const heSo166 = { 18: 0.07719, 21: 0.069355, 24: 0.063512, 36: 0.050251 };
-
-      // let currentPackage=0.99,lock=false;
       let currentPackage = 1.21,
         lock = false;
 
-      const format = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      const parse = (v) => parseFloat(v.replace(/\./g, "")) || 0;
+      const format = (n) => Number(n).toLocaleString("vi-VN");
+      const parse = (v) => parseFloat(String(v).replace(/\./g, "")) || 0;
       const ceil = (n) => Math.ceil(n / 1000) * 1000;
       const formatInput = (el) =>
         (el.value = format(el.value.replace(/\D/g, "")));
 
-      function setPercent(p) {
-        traPercent.value = p;
-        onTraPercentChange();
-      }
-      function setPackage(p) {
-        currentPackage = p;
-        // btn099.className=p===0.99?"btn btn-primary w-100":"btn btn-secondary w-100";
-        btn089.className =
-          p === 0.89 ? "btn btn-primary w-100" : "btn btn-secondary w-100";
-        btn121.className =
-          p === 1.21 ? "btn btn-primary w-100" : "btn btn-secondary w-100";
-        btn151.className =
-          p === 1.51 ? "btn btn-primary w-100" : "btn btn-secondary w-100";
-        // btn166.className =
-        //   p === 1.66 ? "btn btn-primary w-100" : "btn btn-secondary w-100";
-        autoTinh();
-      }
-      function genSuggestions(raw) {
-        let n = parseFloat(raw.replace(/\D/g, "")) || 0;
-        if (n <= 0) return [];
-
-        return [n * 1000, n * 10000, n * 1000000];
-      }
-
-      function onGiaXeSuggest() {
-        let raw = giaXe.value;
-        let box = suggestGiaXe;
-        box.innerHTML = "";
-
-        let list = genSuggestions(raw);
-        if (list.length === 0) return;
-
-        list.forEach((v) => {
-          let btn = document.createElement("button");
-          btn.className = "list-group-item list-group-item-action";
-          btn.innerText = format(v.toString()) + " đ";
-          btn.onclick = () => {
-            giaXe.value = format(v.toString());
-            box.innerHTML = "";
-            autoTinh();
-          };
-          box.appendChild(btn);
+      function renderPackageButtons() {
+        const container = $("packageButtons");
+        container.innerHTML = "";
+        Object.keys(HE_SO).forEach((key) => {
+          const value = parseFloat(key);
+          const btn = document.createElement("button");
+          btn.id = "btn_" + key.replace(".", "");
+          btn.className =
+            value === currentPackage
+              ? "btn btn-primary w-100"
+              : "btn btn-secondary w-100";
+          btn.innerText = key;
+          btn.onclick = () => setPackage(value);
+          container.appendChild(btn);
         });
       }
 
+      function setPackage(p) {
+        currentPackage = p;
+        Object.keys(HE_SO).forEach((key) => {
+          const btn = $("btn_" + key.replace(".", ""));
+          if (!btn) return;
+          btn.className =
+            parseFloat(key) === p
+              ? "btn btn-primary w-100"
+              : "btn btn-secondary w-100";
+        });
+        autoTinh();
+      }
+
+      function setPercent(p) {
+        $("traPercent").value = p;
+        onTraPercentChange();
+      }
+
+      function onGiaXeChange() {
+        formatInput($("giaXe"));
+        genTraTienSuggest();
+        autoTinh();
+      }
+
+      function onTraTienChange() {
+        if (lock) return;
+        lock = true;
+        formatInput($("traTien"));
+        let gia = parse($("giaXe").value);
+        if (gia > 0)
+          $("traPercent").value = (
+            (parse($("traTien").value) / gia) *
+            100
+          ).toFixed(2);
+        lock = false;
+        genTraTienSuggest();
+        autoTinh();
+      }
+
+      function onTraPercentChange() {
+        if (lock) return;
+        lock = true;
+        let gia = parse($("giaXe").value);
+        let percent = parseFloat($("traPercent").value || 0);
+        $("traTien").value = format(ceil((gia * percent) / 100));
+        lock = false;
+        genTraTienSuggest();
+        autoTinh();
+      }
+
       function genTraTienSuggest() {
-        let v = parse(traTien.value);
-        let gia = parse(giaXe.value);
-        let percentStart = parseFloat(traPercent.value) || 10;
-
-        let box = suggestTraTien;
-        box.innerHTML = "";
-
+        let gia = parse($("giaXe").value);
         if (!gia) return;
-
+        let percentStart = parseFloat($("traPercent").value) || 10;
         let list = [];
-
-        // ===== 1️⃣ Gợi ý theo % bắt đầu từ percent đã chọn =====
-        if (percentStart > 0) {
-          for (let p = percentStart; p <= 80; p += 10) {
-            list.push(gia * (p / 100));
-          }
-        } else {
-          // mặc định
-          for (let p = 20; p <= 80; p += 10) {
-            list.push(gia * (p / 100));
-          }
-        }
-
-        // ===== 2️⃣ Nếu nhập tay =====
+        for (let p = percentStart; p <= 80; p += 10) list.push(gia * (p / 100));
+        let v = parse($("traTien").value);
         if (v > 0) {
           list.push(Math.round(v / 50000) * 50000);
           list.push(Math.round(v / 100000) * 100000);
         }
-
-        // ===== 3️⃣ Làm tròn đẹp =====
-        list = list.map((n) => Math.ceil(n / 10000) * 10000);
-
-        // ===== 4️⃣ Lọc =====
-        list = list.filter((n) => n > 0 && n < gia);
-
-        // ===== 5️⃣ Xoá trùng + sort =====
-        list = [...new Set(list)];
-        list.sort((a, b) => a - b);
-
-        // ===== 6️⃣ Render =====
+        list = [
+          ...new Set(
+            list
+              .map((n) => Math.ceil(n / 10000) * 10000)
+              .filter((n) => n > 0 && n < gia),
+          ),
+        ].sort((a, b) => a - b);
+        let box = $("suggestTraTien");
+        box.innerHTML = "";
         list.forEach((n) => {
           let percent = ((n / gia) * 100).toFixed(1);
-
           let btn = document.createElement("button");
-
           btn.className =
             "list-group-item list-group-item-action d-flex justify-content-between";
-
-          btn.innerHTML = `
-      <span>${format(n)} đ</span>
-      <span style="color:#007bff;font-weight:600">
-        ${percent}%
-      </span>
-    `;
-
+          btn.innerHTML = `<span>${format(n)} đ</span><span style="color:#007bff;font-weight:600">${percent}%</span>`;
           btn.onclick = () => {
-            traTien.value = format(n);
+            $("traTien").value = format(n);
             box.innerHTML = "";
             onTraTienChange();
           };
-
           box.appendChild(btn);
         });
       }
 
-      function onGiaXeChange() {
-        formatInput(giaXe);
-        genTraTienSuggest(); // thêm dòng này
-        autoTinh();
-        onGiaXeSuggest();
-      }
-      function onTraTienChange() {
-        if (lock) return;
-        lock = true;
-        formatInput(traTien);
-        if (parse(giaXe.value) > 0)
-          traPercent.value = (
-            (parse(traTien.value) / parse(giaXe.value)) *
-            100
-          ).toFixed(2);
-        lock = false;
-        let box = suggestGiaXe;
-        box.innerHTML = "";
-        genTraTienSuggest(); // thêm dòng này
-        autoTinh();
-      }
-      function onTraPercentChange() {
-        if (lock) return;
-        lock = true;
-        traTien.value = format(
-          ceil((parse(giaXe.value) * parseFloat(traPercent.value || 0)) / 100),
-        );
-        lock = false;
-        let box = suggestGiaXe;
-        box.innerHTML = "";
-        genTraTienSuggest(); // thêm dòng này
-        autoTinh();
-      }
-
       function autoTinh() {
-        if (parse(giaXe.value) > 0 && parse(traTien.value) < parse(giaXe.value))
-          tinhTraGop();
-        else result.style.display = "none";
+        let gia = parse($("giaXe").value);
+        let tra = parse($("traTien").value);
+        if (gia > 0 && tra < gia) tinhTraGop();
+        else $("result").style.display = "none";
       }
 
       function tinhTraGop() {
-        const vay = parse(giaXe.value) - parse(traTien.value);
-        // const heSo=currentPackage===0.99?heSo99:currentPackage===0.89?heSo089:heSo166;
-        let heSo;
-
-        switch (currentPackage) {
-          case 1.21:
-            heSo = heSo121;
-            break;
-
-          case 0.89:
-            heSo = heSo089;
-            break;
-
-          // case 1.51:
-          //   heSo = heSo151;
-          //   break;
-
-          default:
-            heSo = heSo151;
-        }
-
+        let gia = parse($("giaXe").value);
+        let tra = parse($("traTien").value);
+        let vay = gia - tra;
+        let heSo = HE_SO[currentPackage];
         let min = Infinity,
           plans = [];
-        for (let t in heSo) {
-          const thang = ceil(vay * heSo[t] + 12000);
-          const lai = thang * t - vay;
+
+        Object.entries(heSo).forEach(([t, hs]) => {
+          let thang = ceil(vay * hs + 12000);
+          let lai = thang * t - vay;
           if (lai < min) min = lai;
           plans.push({ t, thang, lai });
-        }
-
-        let html = `<b>Giá xe:</b> ${format(giaXe.value)} đ<br>
-            <b>Trả trước:</b> ${format(traTien.value)} đ<br>
-            <b>Khoản vay:</b> ${format(vay)} đ<br><br>`;
-        plans.forEach((p) => {
-          html += `
-    <div class="plan-box ${p.lai === min ? "best-plan" : ""}" onclick="selectPlan(this)">
-      <div class="plan-row"><strong>${p.t} tháng</strong></div>
-      <div class="plan-row"><span>Trả/tháng</span><span class="value">${format(p.thang)} đ</span></div>
-      <div class="divider"></div>
-      <div class="plan-row total"><span>Tổng lãi</span><span class="value">${format(p.lai)} đ</span></div>
-    </div>`;
         });
 
-        result.innerHTML = html;
-        result.style.display = "block";
+        let html = `
+<b>Giá xe:</b> ${format(gia)} đ<br>
+<b>Trả trước:</b> ${format(tra)} đ<br>
+<b>Khoản vay:</b> ${format(vay)} đ<br><br>
+`;
+
+        plans.forEach((p) => {
+          html += `
+<div class="plan-box ${p.lai === min ? "best-plan" : ""}" onclick="selectPlan(this)">
+<div class="plan-row"><strong>${p.t} tháng</strong></div>
+<div class="plan-row"><span>Trả/tháng</span><span class="value">${format(p.thang)} đ</span></div>
+<div class="divider"></div>
+<div class="plan-row total"><span>Tổng lãi</span><span class="value">${format(p.lai)} đ</span></div>
+</div>`;
+        });
+
+        $("result").innerHTML = html;
+        $("result").style.display = "block";
       }
 
       function selectPlan(el) {
@@ -585,14 +448,21 @@
       }
 
       function exportImage() {
-        if (result.style.display === "none") return alert("Chưa có dữ liệu");
-        html2canvas(result).then((c) => {
-          const a = document.createElement("a");
+        if ($("result").style.display === "none")
+          return alert("Chưa có dữ liệu");
+        html2canvas($("result")).then((c) => {
+          let a = document.createElement("a");
           a.href = c.toDataURL();
           a.download = "bang-tra-gop-hdsaison.png";
           a.click();
         });
       }
+
+      window.onload = () => {
+        if (sessionStorage.getItem("logged") === "1")
+          $("loginScreen").style.display = "none";
+        renderPackageButtons();
+      };
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
