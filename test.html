@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Quét QR Code</title>
+<title>Quét CCCD</title>
 
 <style>
   body {
@@ -18,11 +18,13 @@
     margin: 20px auto;
   }
 
-  #result {
-    margin-top: 15px;
-    font-weight: bold;
-    color: green;
-    word-break: break-word;
+  .info {
+    text-align: left;
+    max-width: 400px;
+    margin: 20px auto;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
   }
 
   button {
@@ -34,20 +36,19 @@
     cursor: pointer;
     margin: 5px;
   }
-
-  button:hover {
-    opacity: 0.9;
-  }
 </style>
 </head>
 <body>
 
-<h2>Quét mã QR</h2>
+<h2>Quét CCCD</h2>
 
 <div id="reader"></div>
-<div id="result">Chưa có dữ liệu</div>
 
 <button onclick="switchCamera()">Đổi camera</button>
+
+<div class="info" id="cccdInfo">
+  <b>Chưa có dữ liệu</b>
+</div>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -56,7 +57,6 @@ let scanner;
 let cameras = [];
 let currentCameraIndex = 0;
 
-// 🔥 Khởi động camera
 async function startScanner(cameraId) {
   if (scanner) {
     await scanner.stop();
@@ -69,15 +69,39 @@ async function startScanner(cameraId) {
     cameraId,
     { fps: 10, qrbox: 250 },
     (decodedText) => {
-      document.getElementById("result").innerText = decodedText;
-    },
-    (error) => {
-      // bỏ log cho nhẹ
+      parseCCCD(decodedText);
     }
   );
 }
 
-// 🔁 Đổi camera
+function parseCCCD(text) {
+  const parts = text.split("|");
+
+  if (parts.length < 6) {
+    document.getElementById("cccdInfo").innerHTML =
+      "<b>Không phải QR CCCD hợp lệ</b>";
+    return;
+  }
+
+  const html = `
+    <b>Số CCCD:</b> ${parts[0]} <br/>
+    <b>Họ tên:</b> ${parts[1]} <br/>
+    <b>Ngày sinh:</b> ${formatDate(parts[2])} <br/>
+    <b>Giới tính:</b> ${parts[3]} <br/>
+    <b>Địa chỉ:</b> ${parts[4]} <br/>
+    <b>Ngày cấp:</b> ${formatDate(parts[5])}
+  `;
+
+  document.getElementById("cccdInfo").innerHTML = html;
+}
+
+function formatDate(dateStr) {
+  if (dateStr.length !== 8) return dateStr;
+  return dateStr.substring(0,2) + "/" +
+         dateStr.substring(2,4) + "/" +
+         dateStr.substring(4,8);
+}
+
 async function switchCamera() {
   if (cameras.length < 2) {
     alert("Thiết bị chỉ có 1 camera");
@@ -90,7 +114,6 @@ async function switchCamera() {
   startScanner(cameras[currentCameraIndex].id);
 }
 
-// 🚀 Khi load trang
 window.onload = async () => {
   cameras = await Html5Qrcode.getCameras();
 
@@ -99,7 +122,6 @@ window.onload = async () => {
     return;
   }
 
-  // 👉 Ưu tiên camera sau
   const backCameraIndex = cameras.findIndex(cam =>
     cam.label.toLowerCase().includes("back") ||
     cam.label.toLowerCase().includes("rear")
