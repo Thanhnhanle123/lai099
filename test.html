@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quét QR Code</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f5f6fa;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    #reader {
+      width: 320px;
+      margin: 20px auto;
+    }
+
+    #reader video {
+      border-radius: 10px;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+      word-break: break-word;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Đang quét mã QR...</h2>
+
+  <div id="reader"></div>
+  <div id="result">Chưa có dữ liệu</div>
+
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <script>
+    let scanner;
+    let isFrontCamera = false;
+
+    async function startScanner() {
+      scanner = new Html5Qrcode("reader");
+
+      try {
+        const devices = await Html5Qrcode.getCameras();
+        if (!devices.length) {
+          alert("Không tìm thấy camera");
+          return;
+        }
+
+        // Ưu tiên camera sau
+        const backCamera = devices.find(device =>
+          device.label.toLowerCase().includes("back") ||
+          device.label.toLowerCase().includes("rear")
+        );
+
+        let cameraId;
+
+        if (backCamera) {
+          cameraId = backCamera.id;
+          isFrontCamera = false;
+        } else {
+          cameraId = devices[0].id;
+          isFrontCamera = true;
+        }
+
+        await scanner.start(
+          cameraId,
+          { fps: 10, qrbox: 250 },
+          (decodedText) => {
+            document.getElementById("result").innerText = decodedText;
+            scanner.stop(); // quét xong tự dừng
+          }
+        );
+
+        // Nếu là camera trước thì lật lại cho đúng chiều
+        setTimeout(() => {
+          const video = document.querySelector("#reader video");
+          if (video && isFrontCamera) {
+            video.style.transform = "scaleX(-1)";
+          }
+        }, 500);
+
+      } catch (err) {
+        console.error(err);
+        alert("Không thể mở camera");
+      }
+    }
+
+    // 🚀 Tự chạy khi load trang
+    window.onload = startScanner;
+  </script>
+
+</body>
+</html>
