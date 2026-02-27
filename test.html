@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quét QR CCCD</title>
+<title>Auto Zoom QR CCCD</title>
 
 <style>
 body {
@@ -37,7 +37,7 @@ button {
 
 <body>
 
-<h2>Quét QR CCCD</h2>
+<h2>Quét QR CCCD - Auto Zoom</h2>
 
 <div id="reader"></div>
 <div id="result">Chưa có dữ liệu</div>
@@ -49,44 +49,57 @@ button {
 
 <script>
 let scanner;
+let zoomLevel = 1.5;
+let zoomInterval;
 
 async function startScanner() {
+
   scanner = new Html5Qrcode("reader");
 
   await scanner.start(
-    { facingMode: "environment" }, // ưu tiên cam sau
+    { facingMode: "environment" },
     {
-      fps: 25, // tăng tốc độ bắt
-      qrbox: { width: 130, height: 130 }, // khung nhỏ lại
+      fps: 25,
+      qrbox: { width: 130, height: 130 },
       aspectRatio: 1.0
     },
     async (decodedText) => {
       document.getElementById("result").innerHTML =
         "<b>Kết quả:</b><br>" + decodedText;
 
+      clearInterval(zoomInterval);
       await scanner.stop();
-    },
-    (error) => {
-      console.log(error);
     }
   );
 
-  // thử bật focus liên tục (nếu máy hỗ trợ)
+  // Bật focus liên tục nếu có
   try {
     await scanner.applyVideoConstraints({
       advanced: [{ focusMode: "continuous" }]
     });
-  } catch(e) {}
+  } catch(e){}
 
-  // thử zoom nhẹ (Android hỗ trợ)
-  try {
-    await scanner.applyVideoConstraints({
-      advanced: [{ zoom: 2.0 }]
-    });
-  } catch(e) {}
+  // Bắt đầu auto zoom
+  autoZoom();
+}
+
+function autoZoom() {
+  zoomInterval = setInterval(async () => {
+    if (zoomLevel < 3.5) {
+      zoomLevel += 0.5;
+
+      try {
+        await scanner.applyVideoConstraints({
+          advanced: [{ zoom: zoomLevel }]
+        });
+        console.log("Zoom:", zoomLevel);
+      } catch(e){}
+    }
+  }, 2000); // mỗi 2 giây tăng zoom
 }
 
 async function stopScanner() {
+  clearInterval(zoomInterval);
   if (scanner) {
     await scanner.stop();
   }
