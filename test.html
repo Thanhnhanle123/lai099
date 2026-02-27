@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Quét CCCD</title>
+<title>Quét QR + NFC</title>
 
 <style>
   body {
@@ -19,12 +19,11 @@
   }
 
   .info {
-    text-align: left;
-    max-width: 400px;
-    margin: 20px auto;
+    margin-top: 20px;
     background: white;
     padding: 15px;
     border-radius: 8px;
+    word-break: break-word;
   }
 
   button {
@@ -36,18 +35,23 @@
     cursor: pointer;
     margin: 5px;
   }
+
+  button:hover {
+    opacity: 0.9;
+  }
 </style>
 </head>
 <body>
 
-<h2>Quét CCCD</h2>
+<h2>Quét QR + NFC</h2>
 
 <div id="reader"></div>
 
 <button onclick="switchCamera()">Đổi camera</button>
+<button onclick="readNFC()">Quét NFC</button>
 
-<div class="info" id="cccdInfo">
-  <b>Chưa có dữ liệu</b>
+<div class="info" id="result">
+  Chưa có dữ liệu
 </div>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
@@ -56,6 +60,8 @@
 let scanner;
 let cameras = [];
 let currentCameraIndex = 0;
+
+/* ================= QR ================= */
 
 async function startScanner(cameraId) {
   if (scanner) {
@@ -69,37 +75,10 @@ async function startScanner(cameraId) {
     cameraId,
     { fps: 10, qrbox: 250 },
     (decodedText) => {
-      parseCCCD(decodedText);
+      document.getElementById("result").innerHTML =
+        "<b>QR:</b><br>" + decodedText;
     }
   );
-}
-
-function parseCCCD(text) {
-  const parts = text.split("|");
-
-  if (parts.length < 6) {
-    document.getElementById("cccdInfo").innerHTML =
-      "<b>Không phải QR CCCD hợp lệ</b>";
-    return;
-  }
-
-  const html = `
-    <b>Số CCCD:</b> ${parts[0]} <br/>
-    <b>Họ tên:</b> ${parts[1]} <br/>
-    <b>Ngày sinh:</b> ${formatDate(parts[2])} <br/>
-    <b>Giới tính:</b> ${parts[3]} <br/>
-    <b>Địa chỉ:</b> ${parts[4]} <br/>
-    <b>Ngày cấp:</b> ${formatDate(parts[5])}
-  `;
-
-  document.getElementById("cccdInfo").innerHTML = html;
-}
-
-function formatDate(dateStr) {
-  if (dateStr.length !== 8) return dateStr;
-  return dateStr.substring(0,2) + "/" +
-         dateStr.substring(2,4) + "/" +
-         dateStr.substring(4,8);
 }
 
 async function switchCamera() {
@@ -132,6 +111,39 @@ window.onload = async () => {
 
   startScanner(cameras[currentCameraIndex].id);
 };
+
+
+/* ================= NFC ================= */
+
+async function readNFC() {
+  if (!("NDEFReader" in window)) {
+    alert("Thiết bị hoặc trình duyệt không hỗ trợ NFC");
+    return;
+  }
+
+  try {
+    const ndef = new NDEFReader();
+    await ndef.scan();
+
+    document.getElementById("result").innerHTML =
+      "<b>Đang chờ thẻ NFC...</b>";
+
+    ndef.onreading = (event) => {
+      const decoder = new TextDecoder();
+      let data = "";
+
+      for (const record of event.message.records) {
+        data += decoder.decode(record.data);
+      }
+
+      document.getElementById("result").innerHTML =
+        "<b>NFC:</b><br>" + data;
+    };
+
+  } catch (error) {
+    alert("Lỗi NFC: " + error);
+  }
+}
 </script>
 
 </body>
