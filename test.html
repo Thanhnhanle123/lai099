@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quét QR Code</title>
+  <title>Quét QR - Camera Sau</title>
 
   <style>
     body {
@@ -13,17 +13,9 @@
       padding: 20px;
     }
 
-    h2 {
-      margin-bottom: 10px;
-    }
-
     #reader {
       width: 320px;
       margin: 20px auto;
-    }
-
-    #reader video {
-      border-radius: 10px;
     }
 
     #result {
@@ -31,13 +23,12 @@
       font-weight: bold;
       color: green;
       word-break: break-word;
-      min-height: 24px;
     }
   </style>
 </head>
 <body>
 
-  <h2>Đang quét mã QR...</h2>
+  <h2>Quét QR (Camera Sau)</h2>
 
   <div id="reader"></div>
   <div id="result">Chưa có dữ liệu</div>
@@ -46,50 +37,44 @@
 
   <script>
     let scanner;
-    let isFrontCamera = false;
 
-    async function startScanner() {
+    async function startBackCamera() {
       scanner = new Html5Qrcode("reader");
 
       try {
         const devices = await Html5Qrcode.getCameras();
-        if (!devices.length) {
+
+        if (!devices || devices.length === 0) {
           alert("Không tìm thấy camera");
           return;
         }
 
-        // Ưu tiên camera sau
+        // Tìm camera sau
         const backCamera = devices.find(device =>
           device.label.toLowerCase().includes("back") ||
-          device.label.toLowerCase().includes("rear")
+          device.label.toLowerCase().includes("rear") ||
+          device.label.toLowerCase().includes("environment")
         );
 
-        let cameraId;
-
-        if (backCamera) {
-          cameraId = backCamera.id;
-          isFrontCamera = false;
-        } else {
-          cameraId = devices[0].id;
-          isFrontCamera = true;
+        if (!backCamera) {
+          alert("Không tìm thấy camera sau (thiết bị này có thể chỉ có camera trước)");
+          return;
         }
 
         await scanner.start(
-          cameraId,
-          { fps: 10, qrbox: 250 },
+          backCamera.id,
+          {
+            fps: 10,
+            qrbox: 250
+          },
           (decodedText) => {
             document.getElementById("result").innerText = decodedText;
-            scanner.stop(); // quét xong tự dừng
+            scanner.stop();
+          },
+          (error) => {
+            console.log(error);
           }
         );
-
-        // Nếu là camera trước thì lật lại cho đúng chiều
-        setTimeout(() => {
-          const video = document.querySelector("#reader video");
-          if (video && isFrontCamera) {
-            video.style.transform = "scaleX(-1)";
-          }
-        }, 500);
 
       } catch (err) {
         console.error(err);
@@ -97,8 +82,8 @@
       }
     }
 
-    // 🚀 Tự chạy khi load trang
-    window.onload = startScanner;
+    // 🚀 Tự bật khi load trang
+    window.onload = startBackCamera;
   </script>
 
 </body>
