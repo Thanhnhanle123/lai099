@@ -1,147 +1,94 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Quét QR + NFC</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quét QR CCCD</title>
 
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: #f5f6fa;
-    padding: 20px;
-  }
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #f4f6f9;
+}
 
-  #reader {
-    width: 320px;
-    margin: 20px auto;
-  }
+#reader {
+  width: 320px;
+  margin: 20px auto;
+}
 
-  .info {
-    margin-top: 20px;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    word-break: break-word;
-  }
+#result {
+  margin-top: 15px;
+  font-weight: bold;
+  color: green;
+  word-break: break-word;
+}
 
-  button {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    background: #007bff;
-    color: white;
-    cursor: pointer;
-    margin: 5px;
-  }
-
-  button:hover {
-    opacity: 0.9;
-  }
+button {
+  padding: 10px 20px;
+  margin: 5px;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 6px;
+}
 </style>
 </head>
+
 <body>
 
-<h2>Quét QR + NFC</h2>
+<h2>Quét QR CCCD</h2>
 
 <div id="reader"></div>
+<div id="result">Chưa có dữ liệu</div>
 
-<button onclick="switchCamera()">Đổi camera</button>
-<button onclick="readNFC()">Quét NFC</button>
-
-<div class="info" id="result">
-  Chưa có dữ liệu
-</div>
+<button onclick="startScanner()">Bắt đầu quét</button>
+<button onclick="stopScanner()">Dừng</button>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
 let scanner;
-let cameras = [];
-let currentCameraIndex = 0;
 
-/* ================= QR ================= */
-
-async function startScanner(cameraId) {
-  if (scanner) {
-    await scanner.stop();
-    await scanner.clear();
-  }
-
+async function startScanner() {
   scanner = new Html5Qrcode("reader");
 
   await scanner.start(
-    cameraId,
-    { fps: 10, qrbox: 250 },
-    (decodedText) => {
+    { facingMode: "environment" }, // ưu tiên cam sau
+    {
+      fps: 25, // tăng tốc độ bắt
+      qrbox: { width: 130, height: 130 }, // khung nhỏ lại
+      aspectRatio: 1.0
+    },
+    async (decodedText) => {
       document.getElementById("result").innerHTML =
-        "<b>QR:</b><br>" + decodedText;
+        "<b>Kết quả:</b><br>" + decodedText;
+
+      await scanner.stop();
+    },
+    (error) => {
+      console.log(error);
     }
   );
-}
 
-async function switchCamera() {
-  if (cameras.length < 2) {
-    alert("Thiết bị chỉ có 1 camera");
-    return;
-  }
-
-  currentCameraIndex =
-    (currentCameraIndex + 1) % cameras.length;
-
-  startScanner(cameras[currentCameraIndex].id);
-}
-
-window.onload = async () => {
-  cameras = await Html5Qrcode.getCameras();
-
-  if (!cameras.length) {
-    alert("Không tìm thấy camera");
-    return;
-  }
-
-  const backCameraIndex = cameras.findIndex(cam =>
-    cam.label.toLowerCase().includes("back") ||
-    cam.label.toLowerCase().includes("rear")
-  );
-
-  currentCameraIndex =
-    backCameraIndex !== -1 ? backCameraIndex : 0;
-
-  startScanner(cameras[currentCameraIndex].id);
-};
-
-
-/* ================= NFC ================= */
-
-async function readNFC() {
-  if (!("NDEFReader" in window)) {
-    alert("Thiết bị hoặc trình duyệt không hỗ trợ NFC");
-    return;
-  }
-
+  // thử bật focus liên tục (nếu máy hỗ trợ)
   try {
-    const ndef = new NDEFReader();
-    await ndef.scan();
+    await scanner.applyVideoConstraints({
+      advanced: [{ focusMode: "continuous" }]
+    });
+  } catch(e) {}
 
-    document.getElementById("result").innerHTML =
-      "<b>Đang chờ thẻ NFC...</b>";
+  // thử zoom nhẹ (Android hỗ trợ)
+  try {
+    await scanner.applyVideoConstraints({
+      advanced: [{ zoom: 2.0 }]
+    });
+  } catch(e) {}
+}
 
-    ndef.onreading = (event) => {
-      const decoder = new TextDecoder();
-      let data = "";
-
-      for (const record of event.message.records) {
-        data += decoder.decode(record.data);
-      }
-
-      document.getElementById("result").innerHTML =
-        "<b>NFC:</b><br>" + data;
-    };
-
-  } catch (error) {
-    alert("Lỗi NFC: " + error);
+async function stopScanner() {
+  if (scanner) {
+    await scanner.stop();
   }
 }
 </script>
