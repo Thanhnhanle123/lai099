@@ -1,90 +1,116 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quét QR - Camera Sau</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quét QR Code</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f5f6fa;
-      padding: 20px;
-    }
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #f5f6fa;
+    padding: 20px;
+  }
 
-    #reader {
-      width: 320px;
-      margin: 20px auto;
-    }
+  #reader {
+    width: 320px;
+    margin: 20px auto;
+  }
 
-    #result {
-      margin-top: 15px;
-      font-weight: bold;
-      color: green;
-      word-break: break-word;
-    }
-  </style>
+  #result {
+    margin-top: 15px;
+    font-weight: bold;
+    color: green;
+    word-break: break-word;
+  }
+
+  button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+    margin: 5px;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+</style>
 </head>
 <body>
 
-  <h2>Quét QR (Camera Sau)</h2>
+<h2>Quét mã QR</h2>
 
-  <div id="reader"></div>
-  <div id="result">Chưa có dữ liệu</div>
+<div id="reader"></div>
+<div id="result">Chưa có dữ liệu</div>
 
-  <script src="https://unpkg.com/html5-qrcode"></script>
+<button onclick="switchCamera()">Đổi camera</button>
 
-  <script>
-    let scanner;
+<script src="https://unpkg.com/html5-qrcode"></script>
 
-    async function startBackCamera() {
-      scanner = new Html5Qrcode("reader");
+<script>
+let scanner;
+let cameras = [];
+let currentCameraIndex = 0;
 
-      try {
-        const devices = await Html5Qrcode.getCameras();
+// 🔥 Khởi động camera
+async function startScanner(cameraId) {
+  if (scanner) {
+    await scanner.stop();
+    await scanner.clear();
+  }
 
-        if (!devices || devices.length === 0) {
-          alert("Không tìm thấy camera");
-          return;
-        }
+  scanner = new Html5Qrcode("reader");
 
-        // Tìm camera sau
-        const backCamera = devices.find(device =>
-          device.label.toLowerCase().includes("back") ||
-          device.label.toLowerCase().includes("rear") ||
-          device.label.toLowerCase().includes("environment")
-        );
-
-        if (!backCamera) {
-          alert("Không tìm thấy camera sau (thiết bị này có thể chỉ có camera trước)");
-          return;
-        }
-
-        await scanner.start(
-          backCamera.id,
-          {
-            fps: 10,
-            qrbox: 250
-          },
-          (decodedText) => {
-            document.getElementById("result").innerText = decodedText;
-            scanner.stop();
-          },
-          (error) => {
-            console.log(error);
-          }
-        );
-
-      } catch (err) {
-        console.error(err);
-        alert("Không thể mở camera");
-      }
+  await scanner.start(
+    cameraId,
+    { fps: 10, qrbox: 250 },
+    (decodedText) => {
+      document.getElementById("result").innerText = decodedText;
+    },
+    (error) => {
+      // bỏ log cho nhẹ
     }
+  );
+}
 
-    // 🚀 Tự bật khi load trang
-    window.onload = startBackCamera;
-  </script>
+// 🔁 Đổi camera
+async function switchCamera() {
+  if (cameras.length < 2) {
+    alert("Thiết bị chỉ có 1 camera");
+    return;
+  }
+
+  currentCameraIndex =
+    (currentCameraIndex + 1) % cameras.length;
+
+  startScanner(cameras[currentCameraIndex].id);
+}
+
+// 🚀 Khi load trang
+window.onload = async () => {
+  cameras = await Html5Qrcode.getCameras();
+
+  if (!cameras.length) {
+    alert("Không tìm thấy camera");
+    return;
+  }
+
+  // 👉 Ưu tiên camera sau
+  const backCameraIndex = cameras.findIndex(cam =>
+    cam.label.toLowerCase().includes("back") ||
+    cam.label.toLowerCase().includes("rear")
+  );
+
+  currentCameraIndex =
+    backCameraIndex !== -1 ? backCameraIndex : 0;
+
+  startScanner(cameras[currentCameraIndex].id);
+};
+</script>
 
 </body>
 </html>
