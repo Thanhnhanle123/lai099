@@ -150,6 +150,10 @@
         font-size: 14px;
         text-align: left;
       }
+      .small-checkbox .form-check-input {
+        transform: scale(0.8);
+        margin-top: 0.25rem;
+      }
     </style>
   </head>
 
@@ -198,11 +202,19 @@
         ></button>
       </div>
       <div class="offcanvas-body">
-        <a class="btn btn-light w-100 mb-2" href="index.html">📊 Tính trả góp</a>
-        <a class="btn btn-light w-100 mb-2" href="check_old.html">🎂 Tính tuổi</a>
-        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html">❌ Huỷ hợp đồng</a>
+        <a class="btn btn-light w-100 mb-2" href="index.html"
+          >📊 Tính trả góp</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="check_old.html"
+          >🎂 Tính tuổi</a
+        >
+        <a class="btn btn-light w-100 mb-2" href="cancel_contract.html"
+          >❌ Huỷ hợp đồng</a
+        >
         <hr />
-        <button class="btn btn-danger w-100" onclick="logout()">🔐 Đăng xuất</button>
+        <button class="btn btn-danger w-100" onclick="logout()">
+          🔐 Đăng xuất
+        </button>
       </div>
     </div>
 
@@ -273,6 +285,15 @@
           <div class="modal-body">
             <div class="modal-body">
               <div class="mb-3">
+                <label class="form-label">Tư vấn viên</label>
+                <input
+                  type="text"
+                  id="modalTuVanVien"
+                  class="form-control text-uppercase"
+                  placeholder="VD: A 0701234560"
+                />
+              </div>
+              <div class="mb-3">
                 <label class="form-label">Loại xe</label>
                 <input
                   type="text"
@@ -303,6 +324,17 @@
                   oninput="formatNumberInput(this)"
                   placeholder="VD: 800000"
                 />
+                <div class="form-check mb-3 small-checkbox">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="showInterest"
+                    checked
+                  />
+                  <label class="form-check-label" for="showInterest">
+                    Xuất kèm tổng lãi
+                  </label>
+                </div>
               </div>
               <p>Lưu ý: Có thể xuất không cần nhập thông tin ở trên !</p>
             </div>
@@ -558,6 +590,14 @@
       }
 
       async function confirmExport() {
+        const tuVanVien = $("modalTuVanVien").value.trim();
+
+        // Lưu vào localStorage
+        if (tuVanVien) {
+          localStorage.setItem("tuVanVien", tuVanVien);
+        }
+        const showInterest = $("showInterest").checked;
+
         let gia = parse($("giaXe").value);
         let tra = parse($("traTien").value);
         let vay = gia - tra;
@@ -575,7 +615,7 @@
 
           plans[t] = {
             thang: format(thang) + " đ",
-            lai: format(tongLai) + " đ",
+            lai: showInterest ? " | Lãi: " + format(tongLai) + " đ" : "",
           };
         });
 
@@ -589,10 +629,19 @@
         exportDiv.style.lineHeight = "1.6";
 
         exportDiv.innerHTML = `
-  <div style="text-align:left;margin-bottom:20px;">
-    <img src="./images/logo.png" style="max-width:170px;">
-  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  
+  <img src="./images/logo.png" style="max-width:170px;">
 
+  ${
+    tuVanVien
+      ? `<div style="font-size:26px;font-weight:bold">
+  ${tuVanVien}
+  </div>`
+      : ""
+  }
+
+</div>
   ${loaiXe ? `<b>LOẠI XE:</b> ${loaiXe}<br>` : ""}
   <b>GIÁ XE:</b> ${format(gia)} đ<br>
   <b>TRẢ TRƯỚC:</b> ${format(tra)} đ<br>
@@ -601,12 +650,12 @@
   ${giayTo ? `<b>GIẤY TỜ:</b> ${giayTo} đ<br>` : ""}
   <hr style="margin:10px 0;">
 
-  12 THÁNG: ${plans[12] ? plans[12].thang + " | Lãi: " + plans[12].lai : ""}<br>
-  15 THÁNG: ${plans[15] ? plans[15].thang + " | Lãi: " + plans[15].lai : ""}<br>
-  18 THÁNG: ${plans[18] ? plans[18].thang + " | Lãi: " + plans[18].lai : ""}<br>
-  21 THÁNG: ${plans[21] ? plans[21].thang + " | Lãi: " + plans[21].lai : ""}<br>
-  24 THÁNG: ${plans[24] ? plans[24].thang + " | Lãi: " + plans[24].lai : ""}<br>
-  36 THÁNG: ${plans[36] ? plans[36].thang + " | Lãi: " + plans[36].lai : ""}<br>
+  12 THÁNG: ${plans[12] ? plans[12].thang + plans[12].lai : ""}<br>
+  15 THÁNG: ${plans[15] ? plans[15].thang + plans[15].lai : ""}<br>
+  18 THÁNG: ${plans[18] ? plans[18].thang + plans[18].lai : ""}<br>
+  21 THÁNG: ${plans[21] ? plans[21].thang + plans[21].lai : ""}<br>
+  24 THÁNG: ${plans[24] ? plans[24].thang + plans[24].lai : ""}<br>
+  36 THÁNG: ${plans[36] ? plans[36].thang + plans[36].lai : ""}<br>
 
   <br>
   <b>THỦ TỤC:</b> CCCD CHIP + ĐTDĐ
@@ -643,6 +692,11 @@
         if (sessionStorage.getItem("logged") === "1")
           $("loginScreen").style.display = "none";
         renderPackageButtons();
+        // Load tư vấn viên từ localStorage
+        const savedTVV = localStorage.getItem("tuVanVien");
+        if (savedTVV) {
+          $("modalTuVanVien").value = savedTVV;
+        }
       };
     </script>
 
